@@ -302,6 +302,28 @@ class RegistrationSQLHelper {
         where: 'regid = ?', whereArgs: [registrationId]);
   }
 
+  static Future<List<Map<String, dynamic>>> getEntryLogsForUser(
+      int userId) async {
+    final db = await RegistrationSQLHelper.db();
+    return db.query(
+      'entrylogs',
+      where: 'user_id = ?',
+      whereArgs: [userId],
+      orderBy: 'createdAt DESC',
+    );
+  }
+
+  static Future<List<Map<String, dynamic>>> getExitLogsForUser(
+      int userId) async {
+    final db = await RegistrationSQLHelper.db();
+    return db.query(
+      'exitlogs',
+      where: 'user_id = ?',
+      whereArgs: [userId],
+      orderBy: 'createdAt DESC',
+    );
+  }
+
   static Future<int> insertRegistration(
     String? email,
     String? firstName,
@@ -363,6 +385,7 @@ LEFT JOIN users ON subject_details.id = users.subject_id
       return [];
     }
   }
+
 
   static Future<List<Map<String, dynamic>>>
       fetchUsersWithSubjectDetails() async {

@@ -111,7 +111,7 @@ class _DatabaseHomeState extends State<DatabaseHome> {
           child: Column(
             children: [
               Text(
-                'SETTINGS',
+                'PROFILE',
                 style: TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
@@ -133,7 +133,7 @@ class _DatabaseHomeState extends State<DatabaseHome> {
             Center(
                 child: CircleAvatar(
               radius: 80.0,
-              backgroundImage: AssetImage('images/set1.png'),
+              backgroundImage: AssetImage('images/download.png'),
               backgroundColor: Colors.teal[200],
             )),
             SizedBox(
@@ -752,24 +752,9 @@ class _DatabaseHomeState extends State<DatabaseHome> {
                     builder: (BuildContext context) => DatabaseScreen()));
               },
               child: Icon(
-                Icons.settings_outlined,
+                Icons.admin_panel_settings_rounded,
                 size: 32.0,
                 color: Colors.black54,
-              ),
-            ),
-            label: 'SETTINGS',
-            backgroundColor: Colors.white,
-          ),
-          BottomNavigationBarItem(
-            icon: InkWell(
-              onTap: () {
-                Navigator.of(context).push(MaterialPageRoute(
-                    builder: (BuildContext context) => ProfileScreen()));
-              },
-              child: Icon(
-                Icons.person_outline_rounded,
-                size: 32.0,
-                color: Colors.teal,
               ),
             ),
             label: 'Profile',

@@ -3,6 +3,7 @@ import 'package:qr_id_system/screens/admin_screen/home.dart';
 import 'package:qr_id_system/registration_screen.dart';
 import 'package:qr_id_system/screens/sql_helpers/DatabaseHelper.dart';
 import 'dart:convert';
+// ignore: import_of_legacy_library_into_null_safe
 import 'package:crypto/crypto.dart';
 
 void main() => runApp(MaterialApp(

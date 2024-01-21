@@ -380,27 +380,12 @@ class _MyHomePageState extends State<MyHomePage> {
                       builder: (BuildContext context) => DatabaseScreen()));
                 },
                 child: Icon(
-                  Icons.settings_outlined,
+                  Icons.admin_panel_settings_rounded,
                   size: 32.0,
                   color: Colors.teal,
                 ),
               ),
-              label: 'SETTINGS',
-              backgroundColor: Colors.white,
-            ),
-            BottomNavigationBarItem(
-              icon: InkWell(
-                onTap: () {
-                  Navigator.of(context).push(MaterialPageRoute(
-                      builder: (BuildContext context) => ProfileScreen()));
-                },
-                child: Icon(
-                  Icons.person_outline_rounded,
-                  size: 32.0,
-                  color: Colors.teal,
-                ),
-              ),
-              label: 'Profile',
+              label: 'PROFILE',
               backgroundColor: Colors.white,
             ),
           ],

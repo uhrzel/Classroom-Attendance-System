@@ -14,7 +14,6 @@ import 'package:qr_id_system/screens/admin_screen/entry_logs.dart';
 import 'package:flutter_beep/flutter_beep.dart';
 import 'package:qr_id_system/screens/admin_screen/registered_users.dart';
 import 'package:qr_id_system/screens/sql_helpers/DatabaseHelper.dart';
-import 'package:qr_id_system/screens/admin_screen/profile.dart';
 
 class QRScannerAdmin extends StatelessWidget {
   // This widget is the root of your application.
@@ -67,16 +66,30 @@ class _HomePageState extends State<QRHomeAdmin> {
   String? qrcode;
   String? courses;
 
+  static Future<bool> checkStudentAlreadyEntered(int userId) async {
+    final db = await RegistrationSQLHelper.db();
+    final result = await db.query('entrylogs',
+        where: 'user_id = ?', whereArgs: [userId], limit: 1);
+    return result.isNotEmpty;
+  }
+
+  static Future<bool> checkStudentAlreadyExit(int userId) async {
+    final db = await RegistrationSQLHelper.db();
+    final result = await db.query('exitLogs',
+        where: 'user_id = ?', whereArgs: [userId], limit: 1);
+    return result.isNotEmpty;
+  }
+
   void _insertEntryLogs(BuildContext context) async {
-    final now = new DateTime.now();
+    final now = DateTime.now();
     String entry_date = DateFormat.yMMMMd('en_US').format(now);
     String entry_time = DateFormat.jm().format(now);
 
     // Retrieve the user id that corresponds to the qrcode
     int? userId = await _getUserIdFromQRCode(qrcode);
 
-    // Check if userId is not null
-    if (userId != null) {
+    // Check if userId is not null and the student has not already entered
+    if (userId != null && !await checkStudentAlreadyEntered(userId)) {
       await RegistrationSQLHelper.insertEntry(userId, entry_date, entry_time);
 
       Navigator.of(context).pop();
@@ -90,8 +103,16 @@ class _HomePageState extends State<QRHomeAdmin> {
             backgroundColor: Colors.teal));
       });
     } else {
-      // Handle the case where the user is not found in the database
-      print('User not found');
+      // Handle the case where the user is not found or has already entered
+      Navigator.of(context).pop();
+      setState(() {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text(
+              'Sutdent Already Entry',
+              style: TextStyle(fontSize: 20.0),
+            ),
+            backgroundColor: Colors.yellow[800]));
+      });
     }
   }
 
@@ -106,16 +127,18 @@ class _HomePageState extends State<QRHomeAdmin> {
     return null;
   }
 
-  void _insertExitLogs(BuildContext context, int userId) async {
+  void _insertExitLogs(BuildContext context) async {
     final now = DateTime.now();
     String exit_date = DateFormat.yMMMMd('en_US').format(now);
     String exit_time = DateFormat.jm().format(now);
 
-    int id =
-        await RegistrationSQLHelper.insertExit(userId, exit_date, exit_time);
+    // Retrieve the user id that corresponds to the qrcode
+    int? userId = await _getUserIdFromQRCode(qrcode);
 
-    // Check if id is not -1 (which is returned in case of an error)
-    if (id != -1) {
+    // Check if userId is not null and the student has not already entered
+    if (userId != null && !await checkStudentAlreadyExit(userId)) {
+      await RegistrationSQLHelper.insertExit(userId, exit_date, exit_time);
+
       Navigator.of(context).pop();
 
       setState(() {
@@ -127,7 +150,16 @@ class _HomePageState extends State<QRHomeAdmin> {
             backgroundColor: Colors.teal));
       });
     } else {
-      // handle error, maybe show a message that insertion failed
+      // Handle the case where the user is not found or has already entered
+      Navigator.of(context).pop();
+      setState(() {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text(
+              'Sutdent Already Exit',
+              style: TextStyle(fontSize: 20.0),
+            ),
+            backgroundColor: Colors.yellow[800]));
+      });
     }
   }
 
@@ -334,7 +366,7 @@ class _HomePageState extends State<QRHomeAdmin> {
                                       onPressed: () async {
                                         int userId = _qr_details[0][
                                             'id']; // Replace 'id' with the correct key for the user ID
-                                        _insertExitLogs(context, userId);
+                                        _insertExitLogs(context);
                                       },
                                       child: const Text(
                                         'RECORD EXIT    ',
@@ -509,16 +541,6 @@ class _HomePageState extends State<QRHomeAdmin> {
                         final dateFormat = DateFormat('hh:mm a');
                         final startTime = dateFormat.parse(startTimeString);
 
-                        int lateValue;
-
-                        if (DateTime.now().isBefore(startTime)) {
-                          // Scanning allowed before start time
-                          lateValue = 0;
-                        } else {
-                          // Scanning allowed after start time (late)
-                          lateValue = 1;
-                        }
-
                         String codeScannerReg =
                             await FlutterBarcodeScanner.scanBarcode(
                           '#ff6666',
@@ -532,30 +554,16 @@ class _HomePageState extends State<QRHomeAdmin> {
                           if (new_qrRegistration.isEmpty) {
                             // QR code scan was canceled
                           } else if (new_qrRegistration == _qr_details) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  'Student already registered',
-                                  style: TextStyle(fontSize: 20.0),
-                                ),
-                                backgroundColor: Colors.teal,
-                              ),
-                            );
+                            // Handle the case where the student is already registered,
+                            // but no snackbar is shown in this case.
                           } else {
-                            new_qrRegistration = codeScannerReg;
                             _getQRDetails(context);
-                            _registerLate(lateValue);
-
-                            if (lateValue == 1) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    'You are late!',
-                                    style: TextStyle(fontSize: 20.0),
-                                  ),
-                                  backgroundColor: Colors.red,
-                                ),
-                              );
+                            if (DateTime.now().isBefore(startTime)) {
+                              // Scanning allowed before start time
+                              _registerLate(0); // Not late
+                            } else {
+                              // Scanning allowed after start time (late)
+                              _registerLate(1); // Late
                             }
                           }
                         });
@@ -640,27 +648,12 @@ class _HomePageState extends State<QRHomeAdmin> {
                         builder: (BuildContext context) => DatabaseScreen()));
                   },
                   child: Icon(
-                    Icons.settings_outlined,
+                    Icons.admin_panel_settings_rounded,
                     size: 32.0,
                     color: Colors.teal,
                   ),
                 ),
-                label: 'SETTINGS',
-                backgroundColor: Colors.white,
-              ),
-              BottomNavigationBarItem(
-                icon: InkWell(
-                  onTap: () {
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (BuildContext context) => ProfileScreen()));
-                  },
-                  child: Icon(
-                    Icons.person_outline_rounded,
-                    size: 32.0,
-                    color: Colors.teal,
-                  ),
-                ),
-                label: 'Profile',
+                label: 'PROFILE',
                 backgroundColor: Colors.white,
               ),
             ],

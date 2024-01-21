@@ -11,14 +11,14 @@ class RegistrationSQLHelper {
   static Future<void> createTables(sql.Database database) async {
     await database.execute("""CREATE TABLE IF NOT EXISTS registration(
         regid INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-               email TEXT, 
+              
         firstname TEXT,
         lastname TEXT,
         username TEXT,
         address TEXT,
         subject TEXT,
         password TEXT,
-        status TEXT DEFAULT 'not verified',
+      
         createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
       )
       """);
@@ -35,6 +35,7 @@ class RegistrationSQLHelper {
       id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
       qrCode TEXT,
       fullName TEXT,
+       contactNo TEXT,  
       picture TEXT,
       courses TEXT,
       class TEXT,
@@ -79,6 +80,38 @@ class RegistrationSQLHelper {
     }
   }
 
+  static Future<List<Map<String, dynamic>>> fetchUsersWithEntryLogs() async {
+    try {
+      final db = await RegistrationSQLHelper.db();
+      final List<Map<String, dynamic>> result = await db.rawQuery('''
+      SELECT users.*, entrylogs.entrydate, entrylogs.entrytime
+      FROM users
+      LEFT JOIN entrylogs ON users.id = entrylogs.user_id
+    ''');
+      print(result); // Debugging line to print the result
+      return result;
+    } catch (e) {
+      print('Error fetching users with entry logs: $e');
+      return [];
+    }
+  }
+
+  static Future<List<Map<String, dynamic>>> fetchUsersWithExitLogs() async {
+    try {
+      final db = await RegistrationSQLHelper.db();
+      final List<Map<String, dynamic>> result = await db.rawQuery('''
+      SELECT users.*, exitlogs.exitdate, exitlogs.exittime
+      FROM users
+      LEFT JOIN exitlogs ON users.id = exitlogs.user_id
+    ''');
+      print(result); // Debugging line to print the result
+      return result;
+    } catch (e) {
+      print('Error fetching users with entry logs: $e');
+      return [];
+    }
+  }
+
   static Future<sql.Database> db() async {
     return sql.openDatabase(
       'db.db',
@@ -93,6 +126,7 @@ class RegistrationSQLHelper {
   static Future<int> createItem(
     String qr,
     String? fullname,
+    String? contactNo,
     String? imageString,
     String? course,
     String? className,
@@ -116,6 +150,7 @@ class RegistrationSQLHelper {
     final data = {
       'qrCode': qr,
       'fullName': fullname,
+      'contactNo': contactNo,
       'picture': imageString,
       'courses': course,
       'class': className,
@@ -200,6 +235,7 @@ class RegistrationSQLHelper {
           'id',
           'qrCode',
           'fullName',
+          'contactNo',
           'picture',
           'courses',
           'class',
@@ -291,12 +327,10 @@ class RegistrationSQLHelper {
     return db.query('users', where: "qrCode = ?", whereArgs: [qr], limit: 1);
   }
 
-  static Future<int> updateRegistrationStatus(
-      int registrationId, String status) async {
+  static Future<int> updateRegistrationStatus(int registrationId) async {
     final db = await RegistrationSQLHelper.db();
     final updatedItem = {
       'regid': registrationId,
-      'status': status,
     };
     return await db.update('registration', updatedItem,
         where: 'regid = ?', whereArgs: [registrationId]);
@@ -325,7 +359,6 @@ class RegistrationSQLHelper {
   }
 
   static Future<int> insertRegistration(
-    String? email,
     String? firstName,
     String? lastName,
     String? username,
@@ -337,14 +370,12 @@ class RegistrationSQLHelper {
     final passwordHash = md5.convert(utf8.encode(password ?? '')).toString();
 
     final data = {
-      'email': email,
       'firstname': firstName,
       'lastname': lastName,
       'username': username,
       'address': address,
       'subject': subject,
       'password': passwordHash,
-      'status': 'not verified', // Add the status here
     };
     final id = await db.insert('registration', data,
         conflictAlgorithm: sql.ConflictAlgorithm.replace);
@@ -386,7 +417,6 @@ LEFT JOIN users ON subject_details.id = users.subject_id
     }
   }
 
-
   static Future<List<Map<String, dynamic>>>
       fetchUsersWithSubjectDetails() async {
     try {
@@ -427,7 +457,7 @@ LEFT JOIN users ON subject_details.id = users.subject_id
 
     final result = await db.query(
       'registration',
-      where: 'firstName = ? AND lastName = ? OR username = ?',
+      where: 'firstName = ? AND lastName = ? AND username = ?',
       whereArgs: [firstName, lastName, username],
     );
     return result.isNotEmpty;

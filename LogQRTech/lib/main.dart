@@ -63,27 +63,16 @@ class _HomePageState extends State<HomePage> {
     );
 
     if (matchingRegistration.isNotEmpty) {
-      if (matchingRegistration['status'] == 'verified') {
-        final enteredPasswordHash =
-            md5.convert(utf8.encode(password)).toString();
+      final enteredPasswordHash = md5.convert(utf8.encode(password)).toString();
 
-        if (matchingRegistration['password'] == enteredPasswordHash) {
-          Navigator.of(context).push(MaterialPageRoute(
-            builder: (BuildContext context) => QRScannerAdmin(),
-          ));
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text(
-              'Invalid password!',
-              style: TextStyle(fontSize: 18.0),
-            ),
-            backgroundColor: Colors.red,
-          ));
-        }
+      if (matchingRegistration['password'] == enteredPasswordHash) {
+        Navigator.of(context).push(MaterialPageRoute(
+          builder: (BuildContext context) => QRScannerAdmin(),
+        ));
       } else {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text(
-            'Account not verified! Please verify your account with OTP.',
+            'Invalid password!',
             style: TextStyle(fontSize: 18.0),
           ),
           backgroundColor: Colors.red,

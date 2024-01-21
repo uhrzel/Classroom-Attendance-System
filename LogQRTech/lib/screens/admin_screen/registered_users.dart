@@ -45,6 +45,7 @@ class _HomePageState extends State<HomePage> {
   var new_qrRegistration;
   bool _isLoading = true;
   var fullNameController = TextEditingController();
+  var contactNoController = TextEditingController();
   var qrCodeController = TextEditingController();
   var courseController = TextEditingController();
   var studentIdController = TextEditingController();
@@ -91,6 +92,17 @@ class _HomePageState extends State<HomePage> {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text(
             'Unsuccessful Registration! Please type the student fullname!',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 18.0),
+          ),
+          backgroundColor: Colors.red,
+        ));
+      });
+    } else if (contactNoController.text == '') {
+      setState(() {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(
+            'Unsuccessful Registration! Please include the student course!',
             textAlign: TextAlign.center,
             style: TextStyle(fontSize: 18.0),
           ),
@@ -147,7 +159,8 @@ class _HomePageState extends State<HomePage> {
 
       await RegistrationSQLHelper.createItem(
         studentId!, // qr
-        fullNameController.text, // fullname
+        fullNameController.text,
+        contactNoController.text, // fullname
         imgString, // imageString
         courseController.text, // course
         semesterController.text, // className
@@ -161,6 +174,7 @@ class _HomePageState extends State<HomePage> {
 
   void inputDetails(BuildContext context) {
     fullNameController == '';
+    contactNoController == '';
     qrCodeController == '';
     studentId == '';
     courseController == '';
@@ -392,6 +406,51 @@ class _HomePageState extends State<HomePage> {
                                 child: ListTile(
                                   leading: const Padding(
                                     padding: EdgeInsets.all(6.0),
+                                    child: Icon(
+                                      Icons.text_fields,
+                                      color: Colors.teal,
+                                    ),
+                                  ),
+                                  title: TextField(
+                                    controller: contactNoController,
+                                    onChanged: (value) {},
+                                    style: const TextStyle(
+                                        fontSize: 24.0, color: Colors.teal),
+                                    decoration: InputDecoration(
+                                      hintText: 'Contact Number: 639',
+                                      floatingLabelBehavior:
+                                          FloatingLabelBehavior.never,
+                                      border: OutlineInputBorder(
+                                        borderSide: BorderSide.none,
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            SizedBox(height: 12.0),
+                            Padding(
+                              padding: const EdgeInsets.all(2.0),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.grey.withOpacity(0.5),
+                                      spreadRadius: 2,
+                                      blurRadius: 7,
+                                      offset: const Offset(
+                                          0, 3), // changes position of shadow
+                                    ),
+                                  ],
+                                  color: Colors.white,
+                                  borderRadius: const BorderRadius.all(
+                                    Radius.circular(12.0),
+                                  ),
+                                ),
+                                child: ListTile(
+                                  leading: const Padding(
+                                    padding: EdgeInsets.all(6.0),
                                     child: Icon(Icons.text_fields,
                                         color: Colors.teal),
                                   ),
@@ -596,6 +655,8 @@ class _HomePageState extends State<HomePage> {
 
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
+  final TextEditingController _contactNumberController =
+      TextEditingController();
   final TextEditingController _coursesController = TextEditingController();
   final TextEditingController _semesterController = TextEditingController();
   final TextEditingController _schoolyearController = TextEditingController();
@@ -610,6 +671,7 @@ class _HomePageState extends State<HomePage> {
           _users.firstWhere((element) => element['id'] == id);
       _titleController.text = existingJournal['qrCode'];
       _descriptionController.text = existingJournal['fullName'];
+      _contactNumberController.text = existingJournal['contactNo'];
       _coursesController.text = existingJournal['courses'];
       _semesterController.text = existingJournal['class'];
       _schoolyearController.text = existingJournal['school_year'];
@@ -704,6 +766,45 @@ class _HomePageState extends State<HomePage> {
                           controller: _descriptionController,
                           decoration: InputDecoration(
                             hintText: 'Fullname',
+                            border: OutlineInputBorder(
+                              borderSide: BorderSide.none,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    Container(
+                      decoration: BoxDecoration(
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.5),
+                            spreadRadius: 2,
+                            blurRadius: 7,
+                            offset: const Offset(
+                                0, 3), // changes position of shadow
+                          ),
+                        ],
+                        color: Colors.white,
+                        borderRadius: const BorderRadius.all(
+                          Radius.circular(12.0),
+                        ),
+                      ),
+                      child: ListTile(
+                        leading: const Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Icon(Icons.text_fields_outlined,
+                              color: Colors.teal),
+                        ),
+                        title: TextField(
+                          style: const TextStyle(
+                              fontSize: 24.0, color: Colors.teal),
+                          controller: _contactNumberController,
+                          decoration: InputDecoration(
+                            hintText: 'Contact Number',
                             border: OutlineInputBorder(
                               borderSide: BorderSide.none,
                               borderRadius: BorderRadius.circular(12),
@@ -910,6 +1011,7 @@ class _HomePageState extends State<HomePage> {
       'id': id,
       'qrCode': _titleController.text,
       'fullName': _descriptionController.text,
+      'contactNo': _contactNumberController.text,
       'courses': _coursesController.text,
       'class': _semesterController.text,
       'school_year': _schoolyearController.text,

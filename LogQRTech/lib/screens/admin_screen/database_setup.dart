@@ -72,6 +72,7 @@ class _DatabaseHomeState extends State<DatabaseHome> {
       subject: backup_date + ' ' + backup_time + ' ' + 'Database Backup',
       recipients: [
         'ajmixrhyme@gmail.com',
+        'bhonpere@gmail.com',
       ],
       attachmentPaths: attachments,
       isHTML: isHTML,

@@ -1,6 +1,7 @@
 // ignore_for_file: unnecessary_import, import_of_legacy_library_into_null_safe, unused_import, use_key_in_widget_constructors, non_constant_identifier_names, prefer_typing_uninitialized_variables, unused_field, prefer_is_empty, unnecessary_new, prefer_const_constructors, sized_box_for_whitespace
 
 import 'dart:convert';
+import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:flutter/cupertino.dart';
@@ -14,6 +15,7 @@ import 'package:qr_id_system/screens/admin_screen/entry_logs.dart';
 import 'package:flutter_beep/flutter_beep.dart';
 import 'package:qr_id_system/screens/admin_screen/registered_users.dart';
 import 'package:qr_id_system/screens/sql_helpers/DatabaseHelper.dart';
+import 'package:http/http.dart' as http;
 
 class QRScannerAdmin extends StatelessWidget {
   // This widget is the root of your application.
@@ -80,6 +82,105 @@ class _HomePageState extends State<QRHomeAdmin> {
     return result.isNotEmpty;
   }
 
+  Future<void> _sendSMSNotificationEntry(int userId) async {
+    // Fetch users with entry logs from the database
+    List<Map<String, dynamic>> usersWithEntryLogs =
+        await RegistrationSQLHelper.fetchUsersWithEntryLogs();
+
+    // Filter based on the provided userId
+    List<Map<String, dynamic>> validUsers = usersWithEntryLogs
+        .where((user) =>
+            user['contactNo'] != null &&
+            user['entrydate'] != null &&
+            user['entrytime'] != null &&
+            user['id'] == userId)
+        .toList();
+
+    // Check if any valid user is found
+    if (validUsers.isNotEmpty) {
+      String message = "Hello,\n\nYou have already entered the campus:\n";
+      message +=
+          "${validUsers[0]['contactNo']} (${validUsers[0]['fullName']}) - Entered at ${validUsers[0]['entrydate']} ${validUsers[0]['entrytime']}\n";
+
+      // Extract contact number from the valid user
+      String number = validUsers[0]['contactNo'].toString();
+
+      // Send SMS for the valid user
+      await _sendSMS(message, number, validUsers[0]['id']);
+    }
+  }
+
+  Future<void> _sendSMSNotificationExit(int userId) async {
+    // Fetch users with exit logs from the database
+    List<Map<String, dynamic>> usersWithExitLogs =
+        await RegistrationSQLHelper.fetchUsersWithExitLogs();
+
+    // Filter based on the provided userId
+    List<Map<String, dynamic>> validUsers = usersWithExitLogs
+        .where((user) =>
+            user['contactNo'] != null &&
+            user['exitdate'] != null &&
+            user['exittime'] != null &&
+            user['id'] == userId)
+        .toList();
+
+    // Check if any valid user is found
+    if (validUsers.isNotEmpty) {
+      String message = "Hello,\n\nYou have already exited the campus:\n";
+      message +=
+          "${validUsers[0]['contactNo']} (${validUsers[0]['fullName']}) - Exited at ${validUsers[0]['exitdate']} ${validUsers[0]['exittime']}\n";
+
+      // Extract contact number from the valid user
+      String number = validUsers[0]['contactNo'].toString();
+
+      // Send SMS for the valid user
+      await _sendSMS(message, number, validUsers[0]['id']);
+    }
+  }
+
+  Future<void> _sendSMS(String message, String number, int userId) async {
+    // Set the API endpoint and headers
+    String apiEndpoint = "https://api.infobip.com/sms/2/text/advanced";
+    String apiKey =
+        "a5c13040c1835c417e22401b5db1d8ce-00dd8ba6-9c39-4f05-8ac8-13dd5a65ce9a";
+
+    // Create the request body for the current batch
+    Map<String, dynamic> data = {
+      "messages": [
+        {
+          "destinations": [
+            {"to": number}
+          ],
+          "from": "SmsNotification",
+          "text": message,
+        },
+      ],
+    };
+
+    // Convert data to JSON
+    String jsonData = jsonEncode(data);
+
+    // Set up the HTTP request
+    final response = await http.post(
+      Uri.parse(apiEndpoint),
+      headers: {
+        "Authorization": "App $apiKey",
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+      },
+      body: jsonData,
+    );
+
+    // Check the response for the current batch
+    if (response.statusCode == 200) {
+      print("SMS notification sent successfully for user with ID: $userId");
+    } else {
+      print(
+          "Failed to send SMS notification for user with ID: $userId. Status code: ${response.statusCode}");
+      print("Response body: ${response.body}");
+    }
+  }
+
   void _insertEntryLogs(BuildContext context) async {
     final now = DateTime.now();
     String entry_date = DateFormat.yMMMMd('en_US').format(now);
@@ -102,6 +203,7 @@ class _HomePageState extends State<QRHomeAdmin> {
             ),
             backgroundColor: Colors.teal));
       });
+      await _sendSMSNotificationEntry(userId);
     } else {
       // Handle the case where the user is not found or has already entered
       Navigator.of(context).pop();
@@ -149,6 +251,7 @@ class _HomePageState extends State<QRHomeAdmin> {
             ),
             backgroundColor: Colors.teal));
       });
+      await _sendSMSNotificationExit(userId);
     } else {
       // Handle the case where the user is not found or has already entered
       Navigator.of(context).pop();
@@ -160,6 +263,7 @@ class _HomePageState extends State<QRHomeAdmin> {
             ),
             backgroundColor: Colors.yellow[800]));
       });
+
     }
   }
 

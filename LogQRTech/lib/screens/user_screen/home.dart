@@ -13,7 +13,6 @@ import 'package:qr_id_system/screens/admin_screen/exit_logs.dart';
 import 'package:qr_id_system/screens/admin_screen/registered_users.dart';
 import 'package:qr_id_system/screens/sql_helpers/DatabaseHelper.dart';
 import 'package:qr_id_system/screens/user_screen/entry_logs.dart';
-import 'package:http/http.dart' as http;
 
 class QRScannerUser extends StatelessWidget {
   // This widget is the root of your application.
@@ -66,52 +65,6 @@ class _HomePageState extends State<QRHomeAdmin> {
     });
   }
 
-  Future<void> _sendSMSNotification() async {
-    // Set the phone numbers and message
-    List<String> numbers = ["639090937257", "639154138624"];
-    String message =
-        "Hello,\n\nThis is a test message from Infobip. Have a nice day!";
-
-    // Set the API endpoint and headers
-    String apiEndpoint = "https://api.infobip.com/sms/2/text/advanced";
-    String apiKey =
-        "a5c13040c1835c417e22401b5db1d8ce-00dd8ba6-9c39-4f05-8ac8-13dd5a65ce9a";
-
-    // Create the request body
-    Map<String, dynamic> data = {
-      "messages": [
-        {
-          "destinations": numbers.map((number) => {"to": number}).toList(),
-          "from": "ServiceSMS",
-          "text": message,
-        },
-      ],
-    };
-
-    // Convert data to JSON
-    String jsonData = jsonEncode(data);
-
-    // Set up the HTTP request
-    final response = await http.post(
-      Uri.parse(apiEndpoint),
-      headers: {
-        "Authorization": "App $apiKey",
-        "Content-Type": "application/json",
-        "Accept": "application/json",
-      },
-      body: jsonData,
-    );
-
-    // Check the response
-    if (response.statusCode == 200) {
-      print("SMS notification sent successfully");
-    } else {
-      print(
-          "Failed to send SMS notification. Status code: ${response.statusCode}");
-      print("Response body: ${response.body}");
-    }
-  }
-
   String? fullname;
   String? qrcode;
   String? courses;
@@ -129,7 +82,7 @@ class _HomePageState extends State<QRHomeAdmin> {
       await RegistrationSQLHelper.insertEntry(userId, entry_date, entry_time);
 
       Navigator.of(context).pop();
-      await _sendSMSNotification();
+
       setState(() {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text(

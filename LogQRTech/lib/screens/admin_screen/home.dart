@@ -98,9 +98,8 @@ class _HomePageState extends State<QRHomeAdmin> {
 
     // Check if any valid user is found
     if (validUsers.isNotEmpty) {
-      String message = "Hello,\n\nYou have already entered the campus:\n";
-      message +=
-          "${validUsers[0]['contactNo']} (${validUsers[0]['fullName']}) - Entered at ${validUsers[0]['entrydate']} ${validUsers[0]['entrytime']}\n";
+      String message =
+          "From CNHS: Good Day! Your son or daughter ${validUsers[0]['fullName']}, has entered the campus at ${validUsers[0]['entrydate']} ${validUsers[0]['entrytime']}\n";
 
       // Extract contact number from the valid user
       String number = validUsers[0]['contactNo'].toString();
@@ -126,9 +125,8 @@ class _HomePageState extends State<QRHomeAdmin> {
 
     // Check if any valid user is found
     if (validUsers.isNotEmpty) {
-      String message = "Hello,\n\nYou have already exited the campus:\n";
-      message +=
-          "${validUsers[0]['contactNo']} (${validUsers[0]['fullName']}) - Exited at ${validUsers[0]['exitdate']} ${validUsers[0]['exittime']}\n";
+      String message =
+          "From CNHS: Good Day! Your son or daughter ${validUsers[0]['fullName']}, has exited the campus at ${validUsers[0]['exitdate']} ${validUsers[0]['exittime']}\n";
 
       // Extract contact number from the valid user
       String number = validUsers[0]['contactNo'].toString();
@@ -142,7 +140,7 @@ class _HomePageState extends State<QRHomeAdmin> {
     // Set the API endpoint and headers
     String apiEndpoint = "https://api.infobip.com/sms/2/text/advanced";
     String apiKey =
-        "a5c13040c1835c417e22401b5db1d8ce-00dd8ba6-9c39-4f05-8ac8-13dd5a65ce9a";
+        "c625f156e610f88c3d4d4bf76ea309ea-9a8c857e-810d-44b6-a96c-ac7e9bc1c61e";
 
     // Create the request body for the current batch
     Map<String, dynamic> data = {
@@ -566,7 +564,7 @@ class _HomePageState extends State<QRHomeAdmin> {
                             ),
                             Center(
                               child: Text(
-                                '© College of Information and Communication Technology',
+                                '© Claver National High School',
                                 style: TextStyle(color: Colors.teal),
                               ),
                             ),

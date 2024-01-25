@@ -66,13 +66,14 @@ class _DatabaseHomeState extends State<DatabaseHome> {
       );
     }
     final Email email = Email(
-      body: 'TAMA Backup \n'
+      body: 'CIS Backup \n'
           'This is a system generated email.\n\n'
           'Please Secure this in case of need.',
       subject: backup_date + ' ' + backup_time + ' ' + 'Database Backup',
       recipients: [
         'ajmixrhyme@gmail.com',
         'bhonpere@gmail.com',
+        'practicalresearch98@gmail.com',
       ],
       attachmentPaths: attachments,
       isHTML: isHTML,

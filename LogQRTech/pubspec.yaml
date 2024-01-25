@@ -52,6 +52,7 @@ dependencies:
   csv: ^5.0.2
   excel: ^1.1.5
   crypto: ^2.1.5
+  image_gallery_saver: ^1.6.9
 
 dev_dependencies:
   flutter_test:

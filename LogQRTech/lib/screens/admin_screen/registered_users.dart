@@ -417,7 +417,7 @@ class _HomePageState extends State<HomePage> {
                                     style: const TextStyle(
                                         fontSize: 24.0, color: Colors.teal),
                                     decoration: InputDecoration(
-                                      hintText: 'Contact Number: 639',
+                                      hintText: 'Parent Cp No: 639',
                                       floatingLabelBehavior:
                                           FloatingLabelBehavior.never,
                                       border: OutlineInputBorder(

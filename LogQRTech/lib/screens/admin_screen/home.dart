@@ -23,7 +23,7 @@ class QRScannerAdmin extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       //Given Title
-      title: 'TAMA QRCode Scanner',
+      title: 'CheckInSync QRCode Scanner',
       debugShowCheckedModeBanner: false,
       //Given Theme Color
       theme: ThemeData(
@@ -189,31 +189,50 @@ class _HomePageState extends State<QRHomeAdmin> {
     // Retrieve the user id that corresponds to the qrcode
     int? userId = await _getUserIdFromQRCode(qrcode);
 
-    // Check if userId is not null and the student has not already entered
-    if (userId != null && !await checkStudentAlreadyEntered(userId)) {
-      await RegistrationSQLHelper.insertEntry(userId, entry_date, entry_time);
+    // Check if userId is not null
+    if (userId != null) {
+      bool hasAlreadyEntered = await checkStudentAlreadyEnteredToday(userId);
 
-      Navigator.of(context).pop();
+      if (!hasAlreadyEntered) {
+        await RegistrationSQLHelper.insertEntry(userId, entry_date, entry_time);
 
-      setState(() {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        Navigator.of(context).pop();
+
+        setState(() {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text(
               'Entrance Data successfully Log',
               style: TextStyle(fontSize: 20.0),
             ),
-            backgroundColor: Colors.teal));
-      });
-      await _sendSMSNotificationEntry(userId);
+            backgroundColor: Colors.teal,
+          ));
+        });
+
+        await _sendSMSNotificationEntry(userId);
+      } else {
+        // Handle the case where the user has already entered on the current date
+        Navigator.of(context).pop();
+        setState(() {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text(
+              'Student Already Entered Today',
+              style: TextStyle(fontSize: 20.0),
+            ),
+            backgroundColor: Colors.yellow[800],
+          ));
+        });
+      }
     } else {
-      // Handle the case where the user is not found or has already entered
+      // Handle the case where the user is not found
       Navigator.of(context).pop();
       setState(() {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text(
-              'Sutdent Already Entry',
-              style: TextStyle(fontSize: 20.0),
-            ),
-            backgroundColor: Colors.yellow[800]));
+          content: Text(
+            'User not found',
+            style: TextStyle(fontSize: 20.0),
+          ),
+          backgroundColor: Colors.red,
+        ));
       });
     }
   }
@@ -237,33 +256,74 @@ class _HomePageState extends State<QRHomeAdmin> {
     // Retrieve the user id that corresponds to the qrcode
     int? userId = await _getUserIdFromQRCode(qrcode);
 
-    // Check if userId is not null and the student has not already entered
-    if (userId != null && !await checkStudentAlreadyExit(userId)) {
-      await RegistrationSQLHelper.insertExit(userId, exit_date, exit_time);
+    // Check if userId is not null
+    if (userId != null) {
+      bool hasAlreadyExited = await checkStudentAlreadyExitedToday(userId);
 
-      Navigator.of(context).pop();
+      if (!hasAlreadyExited) {
+        await RegistrationSQLHelper.insertExit(userId, exit_date, exit_time);
 
-      setState(() {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        Navigator.of(context).pop();
+
+        setState(() {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text(
               'Exit Data successfully Log',
               style: TextStyle(fontSize: 20.0),
             ),
-            backgroundColor: Colors.teal));
-      });
-      await _sendSMSNotificationExit(userId);
+            backgroundColor: Colors.teal,
+          ));
+        });
+
+        await _sendSMSNotificationExit(userId);
+      } else {
+        // Handle the case where the user has already exited on the current date
+        Navigator.of(context).pop();
+        setState(() {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text(
+              'Student Already Exited Today',
+              style: TextStyle(fontSize: 20.0),
+            ),
+            backgroundColor: Colors.yellow[800],
+          ));
+        });
+      }
     } else {
-      // Handle the case where the user is not found or has already entered
+      // Handle the case where the user is not found
       Navigator.of(context).pop();
       setState(() {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text(
-              'Sutdent Already Exit',
-              style: TextStyle(fontSize: 20.0),
-            ),
-            backgroundColor: Colors.yellow[800]));
+          content: Text(
+            'User not found',
+            style: TextStyle(fontSize: 20.0),
+          ),
+          backgroundColor: Colors.red,
+        ));
       });
     }
+  }
+
+  Future<bool> checkStudentAlreadyEnteredToday(int userId) async {
+    final db = await RegistrationSQLHelper.db();
+    final now = DateTime.now();
+    final entryDate = DateFormat.yMMMMd('en_US').format(now);
+    final result = await db.query('entrylogs',
+        where: 'user_id = ? AND entrydate = ?',
+        whereArgs: [userId, entryDate],
+        limit: 1);
+    return result.isNotEmpty;
+  }
+
+  Future<bool> checkStudentAlreadyExitedToday(int userId) async {
+    final db = await RegistrationSQLHelper.db();
+    final now = DateTime.now();
+    final exitDate = DateFormat.yMMMMd('en_US').format(now);
+    final result = await db.query('exitlogs',
+        where: 'user_id = ? AND exitdate = ?',
+        whereArgs: [userId, exitDate],
+        limit: 1);
+    return result.isNotEmpty;
   }
 
   void displayDetails() {
@@ -544,7 +604,7 @@ class _HomePageState extends State<QRHomeAdmin> {
                     SizedBox(height: 16.0),
                     Center(
                       child: Image.asset(
-                        'images/warn.gif',
+                        'images/warning.gif',
                         fit: BoxFit.cover,
                       ),
                     ),
@@ -604,7 +664,7 @@ class _HomePageState extends State<QRHomeAdmin> {
               ),
             ),
             title: Text(
-              'TAMA QR CODE SCANNER',
+              'CheckInSync QR SCANNER',
               style: TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.bold,

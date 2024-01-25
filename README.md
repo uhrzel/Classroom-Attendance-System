@@ -1,4 +1,5 @@
 # TAMA
+
 Attendance System Using QR Code Technology (Mobile app based)
 
 ## User - Prof/Instructor
@@ -14,4 +15,6 @@ Attendance System Using QR Code Technology (Mobile app based)
 - View entry and exit logs.
 - Create backups.
 - Can perform CRUD (Create, Read, Update, Delete) operations.
-- Can export to Excel to view students who are late.
+- Can export to Excel
+- Can recieve Sms Notification in Parents Contact No.
+- Can Save QR Code in PNG,JPEG format in you directory

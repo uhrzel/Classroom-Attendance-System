@@ -63,26 +63,68 @@ class _HomePageState extends State<HomePage> {
   }
 
   File? _image;
-  final picker = ImagePicker();
+  final ImagePicker _picker = ImagePicker();
   String? imgString;
   TimeOfDay? selectedTime;
   int? selectedYear;
   late TimeOfDay selectedStartTime;
 
   Future getImage() async {
-    final pickedFile = await picker.pickImage(
-        source: ImageSource.camera,
-        maxWidth: 400,
-        imageQuality: 50,
-        preferredCameraDevice: CameraDevice.front);
-
-    setState(() {
-      _image = File(pickedFile!.path);
-
-      imgString = Utility.base64String(_image!.readAsBytesSync());
-      Navigator.of(context).pop();
-      inputDetails(context);
-    });
+    // Show options for camera or gallery
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return SafeArea(
+          child: Wrap(
+            children: <Widget>[
+              ListTile(
+                leading: Icon(Icons.camera),
+                title: Text('Take Photo'),
+                onTap: () async {
+                  Navigator.pop(context);
+                  final pickedFile = await _picker.pickImage(
+                    source: ImageSource.camera,
+                    maxWidth: 400,
+                    imageQuality: 50,
+                    preferredCameraDevice: CameraDevice.front,
+                  );
+                  if (pickedFile != null) {
+                    setState(() async {
+                      _image = File(pickedFile.path);
+                      // Convert the image to base64 string here
+                      Uint8List imageBytes = await _image!.readAsBytes();
+                      imgString = Utility.base64String(imageBytes);
+                      inputDetails(context); // Move this line to here if needed
+                    });
+                  }
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.image),
+                title: Text('Choose from Gallery'),
+                onTap: () async {
+                  Navigator.pop(context);
+                  final pickedFile = await _picker.pickImage(
+                    source: ImageSource.gallery,
+                    maxWidth: 400,
+                    imageQuality: 50,
+                  );
+                  if (pickedFile != null) {
+                    setState(() async {
+                      _image = File(pickedFile.path);
+                      // Convert the image to base64 string here
+                      Uint8List imageBytes = await _image!.readAsBytes();
+                      imgString = Utility.base64String(imageBytes);
+                      inputDetails(context); // Move this line to here if needed
+                    });
+                  }
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
 // Insert a new journal to the database

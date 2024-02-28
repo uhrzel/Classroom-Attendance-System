@@ -9,18 +9,23 @@ import '../sql_helpers/DatabaseHelper.dart';
 
 Future<void> exportToExcel(BuildContext context) async {
   try {
-    // Check for storage permission, and request if not granted
+    // Check for storage permission
     var status = await Permission.storage.status;
     if (!status.isGranted) {
+      // Request storage permission
       status = await Permission.storage.request();
       if (!status.isGranted) {
+        // Handle denied permission
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Storage permission is denied')),
+          const SnackBar(
+              content: Text(
+                  'Storage permission is required for exporting to Excel')),
         );
         return;
       }
     }
 
+    // Proceed with exporting data to Excel
     // Retrieve data from the database
     var usersWithSubjectDetails =
         await RegistrationSQLHelper.fetchUsersWithSubjectDetails();

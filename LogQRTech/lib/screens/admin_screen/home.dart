@@ -306,22 +306,44 @@ class _HomePageState extends State<QRHomeAdmin> {
     final db = await RegistrationSQLHelper.db();
     final now = DateTime.now();
     final entryDate = DateFormat.yMMMMd('en_US').format(now);
+    final entryTime = DateFormat.Hm().format(now);
+
     final result = await db.query('entrylogs',
         where: 'user_id = ? AND entrydate = ?',
         whereArgs: [userId, entryDate],
+        orderBy: 'createdAt DESC',
         limit: 1);
-    return result.isNotEmpty;
+
+    if (result.isNotEmpty) {
+      final createdAtString = result.first['createdAt'] as String;
+      final lastEntryTime = DateTime.parse(createdAtString);
+      final timeDifference = now.difference(lastEntryTime).inHours;
+      return timeDifference >= 8;
+    }
+
+    return false;
   }
 
   Future<bool> checkStudentAlreadyExitedToday(int userId) async {
     final db = await RegistrationSQLHelper.db();
     final now = DateTime.now();
     final exitDate = DateFormat.yMMMMd('en_US').format(now);
+    final exitTime = DateFormat.Hm().format(now);
+
     final result = await db.query('exitlogs',
         where: 'user_id = ? AND exitdate = ?',
         whereArgs: [userId, exitDate],
+        orderBy: 'createdAt DESC',
         limit: 1);
-    return result.isNotEmpty;
+
+    if (result.isNotEmpty) {
+      final createdAtString = result.first['createdAt'] as String;
+      final lastExitTime = DateTime.parse(createdAtString);
+      final timeDifference = now.difference(lastExitTime).inHours;
+      return timeDifference >= 8;
+    }
+
+    return false;
   }
 
   void displayDetails() {

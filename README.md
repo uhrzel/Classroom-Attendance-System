@@ -6,6 +6,7 @@
 - [User - Prof/Instructor](#user---prof-instructor)
 - [Features](#features)
 - [Instructor Module](#instructor-module)
+- [Demo Link](#demo)
 
 ## Introduction
 
@@ -81,3 +82,7 @@ The Instructor Module provides a user-friendly interface for professors and inst
 
 - **Instructor Panel**
   <img src="LogQRTech/images/profile.jpg" alt="Instructor Panel" height="200">
+
+## Demo
+
+For a live demonstration of the Classroom Attendance System using QR Code Technology, please visit [Demo Link](https://www.youtube.com/watch?v=unACCtfxXSg).

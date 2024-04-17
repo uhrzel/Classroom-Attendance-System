@@ -3,7 +3,7 @@
 ## Table of Contents
 
 - [Introduction](#introduction)
-- [User - Prof/Instructor](#proof-instructor)
+- [User - Prof/Instructor](#prof-instructor)
 - [Features](#features)
 - [Instructor Module](#instructor-module)
 - [Demo Link](#demo)

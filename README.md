@@ -2,11 +2,9 @@
 
 ## Table of Contents
 
-1. [Introduction](#introduction)
-
+- [Introduction](#introduction)
 - [User - Prof/Instructor](#user---prof/instructor)
-
-  - [Features](#features)
+- [Features](#features)
 
 - User can create accounts.
 - User can add subjects.

@@ -18,7 +18,7 @@ By harnessing the power of QR code technology, CAS provides a seamless experienc
 
 Whether you're a seasoned educator looking to modernize your classroom management techniques or a technology enthusiast eager to explore the possibilities of QR code integration, CAS is the perfect solution for your attendance needs.
 
-## Prof/Instructor
+## Prof Instructor
 
 As a Professor or Instructor, you play a crucial role in utilizing the Classroom Attendance System (CAS) to enhance your classroom management and streamline attendance tracking. Here's how you can leverage CAS to optimize your teaching experience:
 

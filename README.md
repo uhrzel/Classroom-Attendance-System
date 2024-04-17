@@ -3,9 +3,9 @@
 ## Table of Contents
 
 - [Introduction](#introduction)
-- [User - Prof/Instructor](#user---prof/instructor)
+- [User - Prof/Instructor](#user---prof-instructor)
 - [Features](#features)
-- [Instructor Module](#module)
+- [Instructor Module](#instructor-module)
 
 ## Introduction
 
@@ -64,6 +64,9 @@ With CAS, you can streamline attendance management, enhance communication with s
 
 The Instructor Module provides a user-friendly interface for professors and instructors to manage attendance effectively. Here's a glimpse of the Instructor Module:
 
-![Instructor Module](LogQRTech/images/login.jpg)
-
-[Add any additional details about the Instructor Module here, if needed.]
+![Instructor Log in](LogQRTech/images/login.jpg)
+![Instructor Scanner](LogQRTech/images/scanner.jpg)
+![Instructor User Logs](LogQRTech/images/entrylogs.jpg)
+![Instructor Registered Users](LogQRTech/images/register1.jpg)
+![Instructor Registration](LogQRTech/images/registration.jpg)
+![Instructor Panel](LogQRTech/images/profile.jpg)

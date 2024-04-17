@@ -502,7 +502,7 @@ class _HomePageState extends State<HomePage> {
                                     style: const TextStyle(
                                         fontSize: 24.0, color: Colors.teal),
                                     decoration: InputDecoration(
-                                      hintText: 'Course',
+                                      hintText: 'Section',
                                       floatingLabelBehavior:
                                           FloatingLabelBehavior.never,
                                       border: OutlineInputBorder(

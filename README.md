@@ -1,10 +1,12 @@
-# TAMA
+# Classroom Attendance System using QR Code Technology
 
-Attendance System Using QR Code Technology (Mobile app based)
+## Table of Contents
 
-## User - Prof/Instructor
+1. [Introduction](#introduction)
 
-### Features
+- [User - Prof/Instructor](#user---prof/instructor)
+
+  - [Features](#features)
 
 - User can create accounts.
 - User can add subjects.

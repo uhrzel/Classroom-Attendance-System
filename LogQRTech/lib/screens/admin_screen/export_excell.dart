@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
-// ignore: import_of_legacy_library_into_null_safe
 import 'package:excel/excel.dart';
 import 'package:permission_handler/permission_handler.dart';
 import '../sql_helpers/DatabaseHelper.dart';
@@ -18,14 +17,14 @@ Future<void> exportToExcel(BuildContext context) async {
         // Handle denied permission
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-              content: Text(
-                  'Storage permission is required for exporting to Excel')),
+            content:
+                Text('Storage permission is required for exporting to Excel'),
+          ),
         );
         return;
       }
     }
 
-    // Proceed with exporting data to Excel
     // Retrieve data from the database
     var usersWithSubjectDetails =
         await RegistrationSQLHelper.fetchUsersWithSubjectDetails();
@@ -41,7 +40,7 @@ Future<void> exportToExcel(BuildContext context) async {
     // Insert the headers in the first row
     var headers = [
       'Full Name',
-      'Courses',
+      'Section',
       'School Year',
       'Semester',
       'Late',
@@ -78,22 +77,33 @@ Future<void> exportToExcel(BuildContext context) async {
       ];
       sheet.appendRow(row);
     }
+
     // Save the Excel file to external storage
     Directory? externalDir = await getExternalStorageDirectory();
-    String filePath = '${externalDir?.path}/student.xlsx';
-    excel.encode().then((onValue) {
-      File file = File(filePath);
-      file.createSync(recursive: true);
-      file.writeAsBytesSync(onValue);
+    if (externalDir != null) {
+      String filePath = '${externalDir.path}/student.xlsx';
+      excel.encode().then((onValue) {
+        File file = File(filePath);
+        file.createSync(recursive: true);
+        file.writeAsBytesSync(onValue);
 
-      // Show a Snackbar instead of printing to console
+        // Show a Snackbar instead of printing to console
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Excel file successfully created at $filePath'),
+          ),
+        );
+      });
+    } else {
+      // Handle the case when external directory is null
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Excel file successfully created at $filePath'),
+          content: Text('Unable to access external storage'),
         ),
       );
-    });
+    }
   } catch (e) {
+    // Handle errors
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('Error while exporting to Excel: $e')),
     );
